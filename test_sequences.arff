@@ -1,0 +1,13 @@
+@relation sequences
+
+@attribute item1 numeric
+@attribute item2 numeric
+@attribute item3 numeric
+@attribute item4 numeric
+
+@data
+1,2,3,4
+1,3,4,?
+1,2,4,?
+1,2,3,4
+2,3,4,?

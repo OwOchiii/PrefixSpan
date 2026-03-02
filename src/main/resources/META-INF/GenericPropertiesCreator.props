@@ -1,0 +1,3 @@
+# Associators
+weka.associations.Associator=\
+ weka.associations.PrefixSpanWeka

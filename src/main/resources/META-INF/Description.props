@@ -1,0 +1,11 @@
+PackageName=PrefixSpan
+Version=1.0.0
+Date=2024-01-01
+Title=PrefixSpan Sequential Pattern Mining
+Category=Associations
+Author=Orochi
+Maintainer=Orochi <orochi@example.com>
+License=GPL 3.0
+Description=Implementation of PrefixSpan algorithm for sequential pattern mining in Weka.
+Depends=weka (>=3.8.0)
+PackageURL=http://example.com/PrefixSpan.zip
