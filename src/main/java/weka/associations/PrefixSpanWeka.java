@@ -31,17 +31,17 @@ public class PrefixSpanWeka extends AbstractAssociator implements OptionHandler 
             Instance inst = data.instance(i);
             List<Integer> sequence = new ArrayList<>();
             for (int j = 0; j < inst.numAttributes(); j++) {
-                if (!inst.isMissing(j)) {
-                    if (inst.attribute(j).isNominal()) {
-                        // Key by VALUE only — "true" is "true" regardless of column
-                        String val = inst.stringValue(j);
-                        if (!nominalMap.containsKey(val)) {
-                            nominalMap.put(val, nextNominalId++);
-                        }
-                        sequence.add(nominalMap.get(val));
-                    } else {
-                        sequence.add((int) inst.value(j));
+                if (j == data.classIndex()) continue;
+                if (inst.isMissing(j)) {
+                    sequence.add(-1); // placeholder: "unknown step"
+                } else if (inst.attribute(j).isNominal()) {
+                    String val = inst.stringValue(j);
+                    if (!nominalMap.containsKey(val)) {
+                        nominalMap.put(val, nextNominalId++);
                     }
+                    sequence.add(nominalMap.get(val));
+                } else {
+                    sequence.add((int) inst.value(j));
                 }
             }
             if (!sequence.isEmpty()) {
