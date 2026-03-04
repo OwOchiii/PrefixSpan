@@ -14,27 +14,34 @@ public class PrefixSpanWeka extends AbstractAssociator implements OptionHandler 
     public void buildAssociations(Instances data) throws Exception {
         List<List<Integer>> sequences = new ArrayList<>();
 
-        // Build a global mapping: (attributeIndex, nominalIndex) -> unique global integer
-        // This prevents "value 0 of attribute 1" from colliding with "value 0 of attribute 2"
-        Map<String, Integer> globalItemMap = new HashMap<>();
-        int nextId = 1; // start at 1, keep 0 reserved or just avoid confusion
+        int maxNumeric = 0;
+        for (int i = 0; i < data.numInstances(); i++) {
+            Instance inst = data.instance(i);
+            for (int j = 0; j < inst.numAttributes(); j++) {
+                if (!inst.isMissing(j) && !inst.attribute(j).isNominal()) {
+                    maxNumeric = Math.max(maxNumeric, (int) inst.value(j));
+                }
+            }
+        }
+
+        Map<String, Integer> nominalMap = new HashMap<>();
+        int nextNominalId = maxNumeric + 1;
 
         for (int i = 0; i < data.numInstances(); i++) {
             Instance inst = data.instance(i);
             List<Integer> sequence = new ArrayList<>();
             for (int j = 0; j < inst.numAttributes(); j++) {
                 if (!inst.isMissing(j)) {
-                    String key;
                     if (inst.attribute(j).isNominal()) {
-                        // Use the actual string value as part of the key
-                        key = j + "_" + inst.stringValue(j);
+                        // Key by VALUE only — "true" is "true" regardless of column
+                        String val = inst.stringValue(j);
+                        if (!nominalMap.containsKey(val)) {
+                            nominalMap.put(val, nextNominalId++);
+                        }
+                        sequence.add(nominalMap.get(val));
                     } else {
-                        key = j + "_" + (int) inst.value(j);
+                        sequence.add((int) inst.value(j));
                     }
-                    if (!globalItemMap.containsKey(key)) {
-                        globalItemMap.put(key, nextId++);
-                    }
-                    sequence.add(globalItemMap.get(key));
                 }
             }
             if (!sequence.isEmpty()) {
