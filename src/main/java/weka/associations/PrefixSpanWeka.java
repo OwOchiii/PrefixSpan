@@ -8,36 +8,26 @@ import Orochi.PrefixSpan.SequencePattern;
 public class PrefixSpanWeka extends AbstractAssociator implements OptionHandler {
     private int minSupport = 2;
     private List<SequencePattern> patterns;
+    private Map<Integer, String> nominalMapping;
 
 
     @Override
     public void buildAssociations(Instances data) throws Exception {
         List<List<Integer>> sequences = new ArrayList<>();
-
-        int maxNumeric = 0;
-        for (int i = 0; i < data.numInstances(); i++) {
-            Instance inst = data.instance(i);
-            for (int j = 0; j < inst.numAttributes(); j++) {
-                if (!inst.isMissing(j) && !inst.attribute(j).isNominal()) {
-                    maxNumeric = Math.max(maxNumeric, (int) inst.value(j));
-                }
-            }
-        }
-
         Map<String, Integer> nominalMap = new HashMap<>();
-        int nextNominalId = maxNumeric + 1;
+        int nextId = 1;
 
         for (int i = 0; i < data.numInstances(); i++) {
             Instance inst = data.instance(i);
             List<Integer> sequence = new ArrayList<>();
             for (int j = 0; j < inst.numAttributes(); j++) {
-                if (j == data.classIndex()) continue;
                 if (inst.isMissing(j)) {
-                    sequence.add(-1); // placeholder: "unknown step"
-                } else if (inst.attribute(j).isNominal()) {
+                    continue; // Skip missing values
+                }
+                if (inst.attribute(j).isNominal()) {
                     String val = inst.stringValue(j);
                     if (!nominalMap.containsKey(val)) {
-                        nominalMap.put(val, nextNominalId++);
+                        nominalMap.put(val, nextId++);
                     }
                     sequence.add(nominalMap.get(val));
                 } else {
@@ -51,6 +41,13 @@ public class PrefixSpanWeka extends AbstractAssociator implements OptionHandler 
 
         PrefixSpan prefixSpan = new PrefixSpan(minSupport);
         patterns = prefixSpan.mine(sequences);
+        
+        // Store reverse mapping for display
+        Map<Integer, String> reverseMap = new HashMap<>();
+        for (Map.Entry<String, Integer> entry : nominalMap.entrySet()) {
+            reverseMap.put(entry.getValue(), entry.getKey());
+        }
+        this.nominalMapping = reverseMap;
     }
 
     @Override
@@ -63,7 +60,17 @@ public class PrefixSpanWeka extends AbstractAssociator implements OptionHandler 
         sb.append("Number of patterns: ").append(patterns.size()).append("\n\n");
 
         for (SequencePattern pattern : patterns) {
-            sb.append(pattern.toString()).append("\n");
+            sb.append("[");
+            List<Integer> p = pattern.getPattern();
+            for (int i = 0; i < p.size(); i++) {
+                if (nominalMapping != null && nominalMapping.containsKey(p.get(i))) {
+                    sb.append(nominalMapping.get(p.get(i)));
+                } else {
+                    sb.append(p.get(i));
+                }
+                if (i < p.size() - 1) sb.append(" -> ");
+            }
+            sb.append("] : ").append(pattern.getSupport()).append("\n");
         }
         return sb.toString();
     }

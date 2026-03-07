@@ -1,0 +1,19 @@
+@relation shopping_sequences
+
+@attribute step1 {Bread,Milk,Eggs,Butter,Cheese,Coffee,Tea,Sugar,Flour,Rice}
+@attribute step2 {Bread,Milk,Eggs,Butter,Cheese,Coffee,Tea,Sugar,Flour,Rice}
+@attribute step3 {Bread,Milk,Eggs,Butter,Cheese,Coffee,Tea,Sugar,Flour,Rice}
+@attribute step4 {Bread,Milk,Eggs,Butter,Cheese,Coffee,Tea,Sugar,Flour,Rice}
+@attribute step5 {Bread,Milk,Eggs,Butter,Cheese,Coffee,Tea,Sugar,Flour,Rice}
+
+@data
+Bread,Milk,Eggs,Butter,?
+Milk,Eggs,Butter,?,?
+Bread,Milk,Butter,Cheese,?
+Coffee,Sugar,Milk,?,?
+Bread,Milk,Eggs,?,?
+Tea,Sugar,Milk,?,?
+Bread,Butter,Cheese,?,?
+Milk,Eggs,Butter,Cheese,?
+Coffee,Sugar,?,?,?
+Bread,Milk,Eggs,Butter,Cheese
